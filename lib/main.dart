@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: ThemeData(
-          colorSchemeSeed: Colors.blue,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
           useMaterial3: true,
         ),
         home: const MyHomePage(),
@@ -42,15 +42,42 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     return Scaffold(
-      body: Column(
-        children: [
-          const Text('Idea aleatoria'),
-          Text(appState.current.asPascalCase),
-          ElevatedButton(
-            onPressed: () => appState.getSiguiente(), 
-            child: Text("Generar nuevo texto")
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            BigCard(idea: appState.current),
+            const SizedBox(height: 10,),
+            ElevatedButton(
+              onPressed: () => appState.getSiguiente(), 
+              child: const Text("Generar nuevo texto")
             ),
-        ]
+          ]
+        ),
+      ),
+    );
+  }
+}
+
+class BigCard extends StatelessWidget {
+  final WordPair idea;
+  const BigCard({super.key, required this.idea});
+
+  @override
+  Widget build(BuildContext context) {
+    final tema = Theme.of(context);
+    final textStlye = tema.textTheme.displaySmall!.copyWith(
+      color: tema.colorScheme.onPrimary
+    );
+
+    return Card(
+      color: tema.colorScheme.primary,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Text(idea.asPascalCase, 
+          style: textStlye,
+          semanticsLabel: "${idea.first} ${idea.second}",
+          ),
       ),
     );
   }
