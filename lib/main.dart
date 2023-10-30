@@ -28,10 +28,21 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier{
   var current = WordPair.random();
+
+  var favoritos = <WordPair>[];
   
   void getSiguiente(){
     current = WordPair.random();
     notifyListeners();
+  }
+
+  void toggleFavorito(){
+    if (favoritos.contains(current)) {
+      favoritos.remove(current);
+    } else {
+      favoritos.add(current);
+    }
+  notifyListeners();
   }
 }
 
@@ -40,21 +51,33 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
+
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            BigCard(idea: appState.current),
-            const SizedBox(height: 10,),
-            ElevatedButton(
-              onPressed: () => appState.getSiguiente(), 
-              child: const Text("Generar nuevo texto")
-            ),
-          ]
-        ),
-      ),
+      body: Row(
+        children: [
+          SafeArea(
+            child: NavigationRail(
+              extended: false,
+              destinations: const [
+                NavigationRailDestination(
+                  icon: Icon(Icons.home), 
+                  label: Text('Inicio')),
+                NavigationRailDestination(
+                  icon: Icon(Icons.favorite), 
+                  label: Text('Favoritos'))
+              ], 
+              selectedIndex: 0,
+              onDestinationSelected: (value) => print('Selecciono $value'),
+            )
+          ),
+          Expanded(
+            child: Container(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: const GeneratorPage(),
+            )
+          )
+        ],
+      )
     );
   }
 }
@@ -80,5 +103,47 @@ class BigCard extends StatelessWidget {
           ),
       ),
     );
+  }
+}
+
+class GeneratorPage extends StatelessWidget {
+  const GeneratorPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var idea = appState.current;
+    IconData icon;
+    if (appState.favoritos.contains(idea)) {
+      icon = Icons.favorite;
+    } else {
+      icon = Icons.favorite_outline;
+    }
+    
+    return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            BigCard(idea: appState.current),
+            const SizedBox(height: 10,),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () => appState.toggleFavorito(), 
+                  icon: Icon(icon),
+                  label: const Text("Favorito")
+                ),
+                const SizedBox(width: 10,),
+                ElevatedButton.icon(
+                  onPressed: () => appState.getSiguiente(),
+                  icon: const Icon(Icons.navigate_next),
+                  label: const Text("Siguiente")
+                ),
+              ],
+            ),
+          ]
+        ),
+      );
   }
 }
