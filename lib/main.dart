@@ -46,38 +46,61 @@ class MyAppState extends ChangeNotifier{
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<MyHomePage> createState() => _MyHomePageState();
+}
 
-    return Scaffold(
-      body: Row(
-        children: [
-          SafeArea(
-            child: NavigationRail(
-              extended: false,
-              destinations: const [
-                NavigationRailDestination(
-                  icon: Icon(Icons.home), 
-                  label: Text('Inicio')),
-                NavigationRailDestination(
-                  icon: Icon(Icons.favorite), 
-                  label: Text('Favoritos'))
-              ], 
-              selectedIndex: 0,
-              onDestinationSelected: (value) => print('Selecciono $value'),
-            )
-          ),
-          Expanded(
-            child: Container(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              child: const GeneratorPage(),
-            )
+class _MyHomePageState extends State<MyHomePage> {
+
+  var selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget page;
+    switch(selectedIndex) {
+      case 0: page = GeneratorPage(); break;
+      case 1: page = Placeholder(); break;
+      default:
+        throw UnimplementedError('No hay un widget para: $selectedIndex');
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Scaffold(
+          body: Row(
+            children: [
+              SafeArea(
+                child: NavigationRail(
+                  extended: constraints.maxWidth >= 600,
+                  destinations: const [
+                    NavigationRailDestination(
+                      icon: Icon(Icons.home), 
+                      label: Text('Inicio')),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.favorite), 
+                      label: Text('Favoritos'))
+                  ], 
+                  selectedIndex: selectedIndex,
+                  onDestinationSelected: (value){
+                    setState(() {
+                      selectedIndex = value;
+                    });
+                  },
+                )
+              ),
+              Expanded(
+                child: Container(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  child: page,
+                )
+              )
+            ],
           )
-        ],
-      )
+        );
+      }
     );
   }
 }
