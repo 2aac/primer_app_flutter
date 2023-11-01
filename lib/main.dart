@@ -62,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
     Widget page;
     switch(selectedIndex) {
       case 0: page = GeneratorPage(); break;
-      case 1: page = Placeholder(); break;
+      case 1: page = FavoritosPage(); break;
       default:
         throw UnimplementedError('No hay un widget para: $selectedIndex');
     }
@@ -168,5 +168,31 @@ class GeneratorPage extends StatelessWidget {
           ]
         ),
       );
+  }
+}
+
+class FavoritosPage extends StatelessWidget {
+  const FavoritosPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var appState =context.watch<MyAppState>();
+    if(appState.favoritos.isEmpty) {
+      return Center(child: Text('Aun no hay favoritos'),);
+    } else {
+      return ListView(
+        children: [
+          Padding(
+            padding: EdgeInsets.all(10),
+            child: Text('Sehan elegido ${appState.favoritos.length} favoritos'),
+            ),
+            for (var i in appState.favoritos)
+              ListTile(
+                leading: Icon(Icons.favorite),
+                title: Text(i.asPascalCase),
+              )
+        ],
+      );
+    }
   }
 }
